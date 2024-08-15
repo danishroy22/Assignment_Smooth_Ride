@@ -1,0 +1,69 @@
+/* Fullscreen map */
+#map {
+  width: 100%;
+  height: 100vh; /* Full viewport height */
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+/* Container for the controls */
+#controls {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 1000; /* Ensure it's on top of the map */
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Style for the map buttons */
+.map-btn {
+  background-color: #fff;
+  border: none;
+  padding: 10px;
+  border-radius: 5px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  font-size: 20px;
+  line-height: 20px;
+}
+
+.map-btn:hover {
+  background-color: #e0e0e0;
+}
+
+/* Directions panel */
+#directions-panel {
+  position: absolute;
+  top: 60px;
+  right: 10px;
+  z-index: 1000;
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 15px;
+  max-height: 400px;
+  width: 300px;
+  overflow-y: auto;
+  display: none; /* Initially hidden */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+#directions-panel.open {
+  display: block;
+}
+
+/* Fullscreen mode adjustments */
+.map-fullscreen .map-btn {
+  display: block !important;
+  z-index: 1000;
+}
+
+.map-fullscreen #directions-panel {
+  max-height: calc(100vh - 100px);
+  width: 100%;
+  height: 100%;
+  top: 0;
+  right: 0;
+  border-radius: 0;
+}
