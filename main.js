@@ -15,7 +15,7 @@ firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
 let map;
-let markers = []; // To store markers
+let markers = []; 
 let directionsService;
 let directionsRenderer;
 

@@ -1,40 +1,53 @@
-/* Fullscreen map */
 #map {
   width: 100%;
-  height: 100vh; /* Full viewport height */
+  height: 100vh; 
   position: absolute;
   top: 0;
   left: 0;
 }
 
-/* Container for the controls */
 #controls {
   position: absolute;
   top: 10px;
   left: 10px;
-  z-index: 1000; /* Ensure it's on top of the map */
+  z-index: 1000; 
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-/* Style for the map buttons */
 .map-btn {
   background-color: #fff;
   border: none;
-  padding: 10px;
-  border-radius: 5px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  padding: 12px 16px;
+  border-radius: 6px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   cursor: pointer;
-  font-size: 20px;
-  line-height: 20px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+  transition: background-color 0.3s, transform 0.2s;
 }
 
 .map-btn:hover {
-  background-color: #e0e0e0;
+  background-color: #f1f1f1;
 }
 
-/* Directions panel */
+.map-btn:active {
+  background-color: #e0e0e0;
+  transform: scale(0.98);
+}
+
+.geolocate-btn {
+  background-color: #4CAF50; 
+  color: white;
+  font-size: 18px;
+}
+
+.geolocate-btn:hover {
+  background-color: #45a049; 
+}
+
 #directions-panel {
   position: absolute;
   top: 60px;
@@ -45,15 +58,15 @@
   max-height: 400px;
   width: 300px;
   overflow-y: auto;
-  display: none; /* Initially hidden */
+  display: none; 
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
 }
 
 #directions-panel.open {
   display: block;
 }
 
-/* Fullscreen mode adjustments */
 .map-fullscreen .map-btn {
   display: block !important;
   z-index: 1000;
@@ -66,4 +79,76 @@
   top: 0;
   right: 0;
   border-radius: 0;
+  box-shadow: none; 
+}
+
+@media (max-width: 1024px) {
+  #controls {
+    top: 5px;
+    left: 5px;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  #directions-panel {
+    width: 100%;
+    max-height: 50vh;
+    bottom: 0;
+    top: auto;
+    right: 0;
+    border-radius: 0;
+  }
+
+  .map-btn {
+    font-size: 14px;
+    padding: 10px;
+  }
+}
+
+@media (max-width: 768px) {
+  #controls {
+    top: 5px;
+    left: 5px;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  #directions-panel {
+    width: 100%;
+    max-height: 50vh;
+    bottom: 0;
+    top: auto;
+    right: 0;
+    border-radius: 0;
+  }
+
+  .map-btn {
+    font-size: 12px;
+    padding: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  #controls {
+    top: 0;
+    left: 0;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  #directions-panel {
+    width: 100%;
+    max-height: 50vh;
+    bottom: 0;
+    top: auto;
+    right: 0;
+    border-radius: 0;
+    padding: 10px;
+    font-size: 12px;
+  }
+
+  .map-btn {
+    font-size: 12px;
+    padding: 8px;
+  }
 }
