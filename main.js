@@ -28,7 +28,8 @@ function initMap() {
         mapTypeId: google.maps.MapTypeId.ROADMAP
     });
 
-    // Initialize Directions Service and Renderer
+    let marker = null;
+
     directionsService = new google.maps.DirectionsService();
     directionsRenderer = new google.maps.DirectionsRenderer({
         map: map,
@@ -39,25 +40,35 @@ function initMap() {
     geolocateButton.textContent = 'Geolocate';
     geolocateButton.classList.add('custom-map-control-button');
     map.controls[google.maps.ControlPosition.TOP_RIGHT].push(geolocateButton);
-    geolocateButton.addEventListener('click', () => {
+    geolocateButton.addEventListener("click", () => {
         if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(position => {
+            navigator.geolocation.watchPosition((position) => {
                 const pos = {
                     lat: position.coords.latitude,
-                    lng: position.coords.longitude
+                    lng: position.coords.longitude,
                 };
+
                 map.setCenter(pos);
-                new google.maps.Marker({
-                    position: pos,
-                    map: map,
-                    title: 'You are here'
-                });
-            }, (error) => {
-                console.error('Error getting location:', error);
-                alert('Error getting location. Please check your browser permissions.');
+
+                if (marker) {
+                    marker.setPosition(pos);
+                } else {
+                    marker = new google.maps.Marker({
+                        position: pos,
+                        map: map,
+                    });
+                }
+            },
+            (error) => {
+                console.error("Error watching position: ", error);
+            },
+            {
+                enableHighAccuracy: true,
+                maximumAge: 0,
+                timeout: 50000,
             });
         } else {
-            alert('Geolocation is not supported by this browser.');
+            alert("Geolocation is not supported by this browser.");
         }
     });
 
@@ -158,5 +169,4 @@ function calculateAndDisplayRoute(origin, destination) {
     });
 }
 
-// Initialize the map when the window loads
 window.onload = initMap;
