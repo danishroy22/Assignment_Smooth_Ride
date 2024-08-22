@@ -15,7 +15,7 @@ firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
 let map;
-let markers = []; 
+let markers = {}; // Object to store markers by their Firebase keys
 let directionsService;
 let directionsRenderer;
 
@@ -27,8 +27,6 @@ function initMap() {
         zoom: 8,
         mapTypeId: google.maps.MapTypeId.ROADMAP
     });
-
-    let marker = null;
 
     directionsService = new google.maps.DirectionsService();
     directionsRenderer = new google.maps.DirectionsRenderer({
@@ -49,15 +47,6 @@ function initMap() {
                 };
 
                 map.setCenter(pos);
-
-                if (marker) {
-                    marker.setPosition(pos);
-                } else {
-                    marker = new google.maps.Marker({
-                        position: pos,
-                        map: map,
-                    });
-                }
             },
             (error) => {
                 console.error("Error watching position: ", error);
@@ -78,46 +67,59 @@ function initMap() {
 function fetchAndPlotData() {
     const locationsRef = database.ref('users');
 
-    locationsRef.on('value', (snapshot) => {
-        const locations = snapshot.val();
-        if (locations) {
-            plotData(locations);
-        } else {
-            console.error('No data available');
-        }
-    }, (error) => {
-        console.error('Error fetching data:', error);
+    // Listen for new data added
+    locationsRef.on('child_added', (snapshot) => {
+        const key = snapshot.key;
+        const location = snapshot.val();
+        addOrUpdateMarker(key, location);
+    });
+
+    // Listen for data changes
+    locationsRef.on('child_changed', (snapshot) => {
+        const key = snapshot.key;
+        const location = snapshot.val();
+        addOrUpdateMarker(key, location);
+    });
+
+    // Listen for data removal
+    locationsRef.on('child_removed', (snapshot) => {
+        const key = snapshot.key;
+        removeMarker(key);
     });
 }
 
-function plotData(locations) {
-    markers.forEach(marker => marker.setMap(null));
-    markers = [];
+function addOrUpdateMarker(key, location) {
+    // Remove existing marker if it exists
+    if (markers[key]) {
+        markers[key].setMap(null);
+    }
 
-    for (const key in locations) {
-        if (locations.hasOwnProperty(key)) {
-            const location = locations[key];
+    snapToRoads(location.Latitude, location.Longitude, (snappedLat, snappedLng) => {
+        const latLng = new google.maps.LatLng(snappedLat, snappedLng);
 
-            snapToRoads(location.Latitude, location.Longitude, (snappedLat, snappedLng) => {
-                const latLng = new google.maps.LatLng(snappedLat, snappedLng);
+        const marker = new google.maps.Marker({
+            position: latLng,
+            map: map,
+            title: `Lat: ${location.Latitude}, Lng: ${location.Longitude}, Index: ${location.index}`,
+            icon: {
+                path: google.maps.SymbolPath.CIRCLE,
+                scale: 5,
+                fillColor: getColorByIndex(location.index),
+                fillOpacity: 0.8,
+                strokeColor: 'white',
+                strokeWeight: 0.6
+            }
+        });
 
-                const marker = new google.maps.Marker({
-                    position: latLng,
-                    map: map,
-                    title: `Lat: ${location.Latitude}, Lng: ${location.Longitude}, Index: ${location.index}`,
-                    icon: {
-                        path: google.maps.SymbolPath.CIRCLE,
-                        scale: 5,
-                        fillColor: getColorByIndex(location.index),
-                        fillOpacity: 0.8,
-                        strokeColor: 'white',
-                        strokeWeight: 0.6
-                    }
-                });
+        // Store the marker by its Firebase key
+        markers[key] = marker;
+    });
+}
 
-                markers.push(marker);
-            });
-        }
+function removeMarker(key) {
+    if (markers[key]) {
+        markers[key].setMap(null); // Remove the marker from the map
+        delete markers[key]; // Remove the marker from the object
     }
 }
 
