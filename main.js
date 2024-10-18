@@ -1,23 +1,21 @@
 console.log("Script loaded");
 
 const firebaseConfig = {
-  apiKey: 'AIzaSyBGc13TJXQ0H25FJZKIJuG5eLUKPLYZnZI',
-  authDomain: 'database2-c6ea1.firebaseapp.com',
-  databaseURL: "https://database2-c6ea1-default-rtdb.firebaseio.com/",
-  projectId: "database2-c6ea1",
-  storageBucket: "database2-c6ea1.appspot.com",
-  messagingSenderId: "876911634659",
-  appId: "1:876911634659:web:b975f6b45f90e603903dd6",
-  measurementId: "G-F9XCGE0T3Q"
+    apiKey: "AIzaSyDv9aVCAK3QfpyZPsRzekJlc3MsBfZoxrg",
+    authDomain: "test-f6ef2.firebaseapp.com",
+    databaseURL: "https://test-f6ef2-default-rtdb.firebaseio.com",
+    projectId: "test-f6ef2",
+    storageBucket: "test-f6ef2.appspot.com",
+    messagingSenderId: "148456236172",
+    appId: "1:148456236172:web:8a09751c0fd0a1a76f47a9",
+    measurementId: "G-MX40KYM5YS"
 };
 
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
 let map;
-let markers = {}; // Object to store markers by their Firebase keys
-let directionsService;
-let directionsRenderer;
+let markers = {};
 
 function initMap() {
     console.log("Map initialized");
@@ -28,8 +26,9 @@ function initMap() {
         mapTypeId: google.maps.MapTypeId.ROADMAP
     });
 
-    directionsService = new google.maps.DirectionsService();
-    directionsRenderer = new google.maps.DirectionsRenderer({
+    // Initialize directionsService and directionsRenderer
+    const directionsService = new google.maps.DirectionsService();
+    const directionsRenderer = new google.maps.DirectionsRenderer({
         map: map,
         panel: document.getElementById('directions-panel')
     });
@@ -61,6 +60,7 @@ function initMap() {
         }
     });
 
+    // Fetch data and plot markers
     fetchAndPlotData();
 }
 
@@ -94,17 +94,17 @@ function addOrUpdateMarker(key, location) {
         markers[key].setMap(null);
     }
 
-    snapToRoads(location.Latitude, location.Longitude, (snappedLat, snappedLng) => {
+    snapToRoads(location.latitude, location.longitude, (snappedLat, snappedLng) => {
         const latLng = new google.maps.LatLng(snappedLat, snappedLng);
 
         const marker = new google.maps.Marker({
             position: latLng,
             map: map,
-            title: `Lat: ${location.Latitude}, Lng: ${location.Longitude}, Index: ${location.index}`,
+            title: `Lat: ${location.latitude}, Lng: ${location.longitude}, PDI: ${location.pdi}`,
             icon: {
                 path: google.maps.SymbolPath.CIRCLE,
                 scale: 5,
-                fillColor: getColorByIndex(location.index),
+                fillColor: getColorByPdi(location.pdi),
                 fillOpacity: 0.8,
                 strokeColor: 'white',
                 strokeWeight: 0.6
@@ -123,16 +123,14 @@ function removeMarker(key) {
     }
 }
 
-function getColorByIndex(index) {
-    switch (index) {
-        case 'small':
+function getColorByPdi(pdi) {
+    switch (pdi) {
+        case '2':
             return '#FFFF00'; // Yellow
-        case 'medium':
+        case '3':
             return '#FFA500'; // Orange
-        case 'HUGE!!!':
-            return '#FF0000'; // Red
         default:
-            return '#000000'; // Black
+            return '#FF0000'; // Red
     }
 }
 
@@ -151,7 +149,7 @@ function snapToRoads(lat, lng, callback) {
         })
         .catch(error => {
             console.error('Error snapping to roads:', error);
-            callback(lat, lng);
+            callback(lat, lng); // If there's an error, use the original coordinates
         });
 }
 
@@ -171,4 +169,6 @@ function calculateAndDisplayRoute(origin, destination) {
     });
 }
 
-window.onload = initMap;
+window.onload = () => {
+    console.log("Script loaded");
+};
