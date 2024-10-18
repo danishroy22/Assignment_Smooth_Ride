@@ -37,18 +37,36 @@ function initMap() {
     geolocateButton.textContent = 'Geolocate';
     geolocateButton.classList.add('custom-map-control-button');
     map.controls[google.maps.ControlPosition.TOP_RIGHT].push(geolocateButton);
-    geolocateButton.addEventListener("click", () => {
+     geolocateButton.addEventListener("click", () => {
         if (navigator.geolocation) {
-            navigator.geolocation.watchPosition((position) => {
+            navigator.geolocation.getCurrentPosition((position) => {
                 const pos = {
                     lat: position.coords.latitude,
                     lng: position.coords.longitude,
                 };
 
+                // Add a marker for the current location
+                new google.maps.Marker({
+                    position: pos,
+                    map: map,
+                    title: 'Your Location',
+                    icon: {
+                        path: google.maps.SymbolPath.CIRCLE,
+                        scale: 7,
+                        fillColor: '#4285F4', // Blue color
+                        fillOpacity: 0.8,
+                        strokeColor: 'white',
+                        strokeWeight: 1,
+                    }
+                });
+
+                // Center the map at the user's location
                 map.setCenter(pos);
+                map.setZoom(15); // Zoom in to the user's location
             },
             (error) => {
                 console.error("Error watching position: ", error);
+                alert("Unable to retrieve your location. Please check if location access is enabled.");
             },
             {
                 enableHighAccuracy: true,
